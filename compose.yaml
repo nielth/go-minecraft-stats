@@ -1,0 +1,23 @@
+# Works with plain `docker compose up -d --build` and as a Komodo stack.
+# Prometheus scrapes http://mc-stats:9225/metrics over the external
+# `public-caddy` network. No host ports are published.
+#
+# Settings come from .env (or the stack's Environment in Komodo):
+#   MC_DATA   the Minecraft server's data folder (the one holding usercache.json
+#             and the world), mounted read-only
+#   MC_WORLD  world folder name inside MC_DATA (default world)
+services:
+  mc-stats:
+    build: .
+    container_name: mc-stats
+    volumes:
+      - ${MC_DATA:-/home/thomasnie/minecraft-data}:/data:ro
+    environment:
+      MC_WORLD: ${MC_WORLD:-world}
+    networks:
+      - public-caddy
+    restart: unless-stopped
+
+networks:
+  public-caddy:
+    external: true
